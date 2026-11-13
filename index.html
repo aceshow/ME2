@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<title>ME2</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="theme-color" content="#4a3bd8">
+	<meta name="referrer" content="no-referrer">
+	<meta name="robots" content="noindex, nofollow">
+	<!-- 所有链接默认新标签页打开 -->
+	<base target="_blank">
+	<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC5ElEQVR42sXXTWhcVRQH8N99STotltZvpGAJVApFm0VFd+1U1FUVpJvWutCAkdKFi6JuC92IqGtB3LSCkIUfoEvBTIrgQrvr1lZwIdoqNS3NpI3XRc7MvMxMXiftTHPgMufNnDnn3HPP+//PTdYpuVFrqZtxMPQ5LEKqN9flr1hX8J/Gyo/TmI013bb5cWx0CWiOt7RHMYNtsWbiO26NjzCBjryAvaXnvXjxThwVg5/9ppa6BcdQ3uo4Xo3fyn0yzAqklvIM9vcx2I9nR1KBzo5ywtE4927ZhiNhI8/VRtEDaTcOVRgcCptSwaqlp2Xz/CZygdzP/hXsrPC3M2w+6FQuRzYZhVRfXL2ldTTMY/gOT9/G7he8hD8GrEBC3h5nuBX34wE8FOuR+NyFqQF8TuFz/Ior+AuX8Xesq1jAv7KrKTdqb+M1PBwJbEENE4Of5O37GDfRxA1cj8S+SLlRu4b7bIxcL3DRxsnFAm+gsQHB5zFdRNe+jq/vYfBvIubPLSD6DW/hUyyPMPByxJjBpW4kvIyTeD86ddhyI3yfjFgdwMxzm0m5jI7HcTrwYBjyD07hE9xaiZykA4ud9zzP10rom5CP4EM8fpfBf8c75Nk2rOQkHVxcTUbpQLMLN8ziqyHs/ssVXx1MawXvYcNUb5LahhOYHEICk+ELqWdo7aXjnMtz354hJLAn+KQvw1bNA7uwYwgJ7MATdzKQTAU53a1srWLRomIA3DdEDNi3FrOuSiCfaw9I27vG7n5yDWdxJvQqeSp8yo2JigqkojxaTVZw+7kYzd8MWD0W5JIr3oSVUa4oKhIYa9PAk2ug4CW8h8P4NoaMm6Efxrtr0PuD4RNjFQkstY9gd5flAj6LWe+jMpaX5Ao+xsthu1DeWvjkv+WBmvB8BFnCD3HrOYELZbxI9Wa/2/CFsD0a/10KX+crrztdV6pxPBcA8j3+7EHMfs2xik/aYPZ8zH9zK0SUpfpS2+B/pi2xWR7CVOwAAAAASUVORK5CYII=">
+	<style>
+		:root {
+			--ink: #1d1450;                      /* 主文字: 深靛蓝 */
+			--ink-soft: rgba(29, 20, 80, .84);
+			--card: rgba(255, 255, 255, .3);     /* 卡片透明度: 数值越小越透 */
+			--chip: rgba(255, 255, 255, .4);     /* 链接按钮透明度 */
+			--line: rgba(255, 255, 255, .7);
+			--k: 1;                              /* 魔方缩放, 随分辨率变化 */
+			--bg-img: url(data:image/webp;base64,UklGRkIBAABXRUJQVlA4IDYBAACQCQCdASpAACQAPm0skkWkIqGWpSRABsS1AE6ZaD0j078QPZZrX9o+/eS+aLPlkhQ3gqQaGh0cf+kWq/8L4m15qN9FCTPtjPThycN9SqKyAD4UpFoQAP7dyri3d1SsBiX/9VJ6FkinlAcZ//3Ar9r+21hvttSgO7zQaWRpp3s3mOVZIXGIdKujN4Dc/HOaEOU3HBA0ubN9TqNRFkRh7EwAlO4pMBjQRHMPBMYDouP5KAgmrQruiF+8OOcuvnURaVDn3UCtRsEs5cuZyiOzdWW5kjlUQcfmdDXy+SAj3GCN6tFKrCz55sinMx2XYbd5rOPKvh6TrbIaidEMg79xe2+AgcDdmj+q7faaAAqgertNoyUDUTQ3Jl8MG0xwy8OcBhh4XBOcxmzVSfOnOwlIqc7JsiGIpTQA);
+		}
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+		body {
+			min-height: 100vh;
+			min-height: 100dvh;
+			color: var(--ink);
+			font: .9375rem/1.5 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+			-webkit-font-smoothing: antialiased;
+		}
+		/* 背景: 固定层做得比屏幕更高 (lvh = 地址栏收起时的最大视口), html 本身也铺同一张图,
+		   这样手机滑动时地址栏收放、橡皮筋回弹都不会露出底色 */
+		html { background: var(--bg-img) center / 100% 100% no-repeat, #4a3bd8; }
+		body::before {
+			content: "";
+			position: fixed;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 120vh;
+			height: 120lvh;
+			z-index: -1;
+			background: var(--bg-img) center / 100% 100% no-repeat;
+			pointer-events: none;
+		}
+		a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+		ul { list-style: none; }
+		[hidden] { display: none !important; }
+		.wrap {
+			max-width: 74rem;
+			margin: 0 auto;
+			padding: max(clamp(1rem, 4vw, 2.5rem), env(safe-area-inset-top)) max(clamp(.75rem, 3vw, 1.5rem), env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(clamp(.75rem, 3vw, 1.5rem), env(safe-area-inset-left));
+		}
+
+		/* ===== 顶部 ===== */
+		header { display: flex; flex-direction: column; align-items: center; gap: clamp(.5rem, 2vw, .9rem); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+
+		/* ===== 魔方 (3x3 由 JS 生成, 点击还原) ===== */
+		.cube-scene {
+			position: relative;
+			width: calc(104px * var(--k));
+			height: calc(104px * var(--k));
+			display: grid;
+			place-items: center;
+			perspective: calc(520px * var(--k));
+			cursor: pointer;
+			user-select: none;
+			-webkit-tap-highlight-color: transparent;
+			outline: 0;
+			animation: bob 3.2s ease-in-out infinite;
+			transition: scale .25s cubic-bezier(.3, 1.6, .5, 1);
+		}
+		.cube-scene:hover, .cube-scene:focus-visible { scale: 1.12; }
+		.cube-scene:active { scale: .95; }
+		.cube-scene.off, .cube-scene.off .cube { animation-play-state: paused; }   /* 滚出视野时暂停 */
+		.cube-scene::after {                       /* 脚下的光晕, 代替黑色投影 */
+			content: "";
+			position: absolute;
+			z-index: -1;
+			inset: 8%;
+			border-radius: 50%;
+			background: radial-gradient(closest-side, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0));
+		}
+		.cube {
+			position: relative;
+			width: 0;
+			height: 0;
+			scale: var(--k);
+			opacity: 0;
+			transform-style: preserve-3d;
+			will-change: transform;
+			transition: opacity .35s;
+			animation: spin 16s linear infinite;
+		}
+		.cube.ready { opacity: 1; }
+		.cb { position: absolute; left: 50%; top: 50%; width: 17px; height: 17px; margin: -8.5px 0 0 -8.5px; transform-style: preserve-3d; }
+		.f { position: absolute; inset: 0; border-radius: 3px; background: #1d1747; backface-visibility: hidden; }
+		.p0 { transform: translateZ(8.5px); }
+		.p1 { transform: rotateY(180deg) translateZ(8.5px); }
+		.p2 { transform: rotateY(90deg) translateZ(8.5px); }
+		.p3 { transform: rotateY(-90deg) translateZ(8.5px); }
+		.p4 { transform: rotateX(90deg) translateZ(8.5px); }
+		.p5 { transform: rotateX(-90deg) translateZ(8.5px); }
+		.k0, .k1, .k2, .k3, .k4, .k5 {
+			background: linear-gradient(135deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 55%), var(--c);
+			box-shadow: inset 0 0 0 1.5px #1d1747;
+		}
+		.k0 { --c: #43b047; }
+		.k1 { --c: #1e88e5; }
+		.k2 { --c: #ef3b36; }
+		.k3 { --c: #ff9800; }
+		.k4 { --c: #ffd92f; }
+		.k5 { --c: #f4f4f4; }
+		@keyframes spin {
+			from { transform: rotateX(-26deg) rotateY(0deg); }
+			to { transform: rotateX(-26deg) rotateY(360deg); }
+		}
+		@keyframes bob {
+			0%, 100% { translate: 0 0; }
+			50% { translate: 0 -5px; }
+		}
+
+		/* ===== 搜索框: 放大镜 + 居中文字 ===== */
+		.search {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: .6rem;
+			width: min(100%, 31rem);
+			height: 3.1rem;
+			padding: 0 1.3rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			background: rgba(255, 255, 255, .46);
+			box-shadow: 0 8px 26px -10px rgba(110, 70, 255, .55);
+			cursor: text;
+			transition: background .2s, box-shadow .2s;
+		}
+		.search:focus-within {
+			background: rgba(255, 255, 255, .88);
+			box-shadow: 0 0 0 4px rgba(255, 255, 255, .45), 0 10px 32px -8px rgba(142, 68, 255, .65);
+		}
+		.search svg { flex: none; width: 1.25rem; height: 1.25rem; color: var(--ink); opacity: .8; }
+		.auto {                                    /* 输入框宽度随文字自适应, 保证整体居中 */
+			display: inline-grid;
+			min-width: 0;
+			font-size: max(16px, 1rem);            /* 不小于 16px, 避免 iOS 聚焦时自动放大页面 */
+			font-weight: 600;
+		}
+		.auto::after { content: attr(data-v) " "; grid-area: 1 / 1; visibility: hidden; white-space: pre; overflow: hidden; }
+		.auto input {
+			grid-area: 1 / 1;
+			width: 0;                              /* 忽略 input 自带的固有宽度, 完全由文字宽度撑开 */
+			min-width: 100%;
+			border: 0;
+			outline: 0;
+			padding: 0;
+			background: none;
+			color: var(--ink);
+			font: inherit;
+			text-overflow: ellipsis;
+		}
+		.auto input::placeholder { color: var(--ink-soft); font-weight: 600; }
+
+		/* ===== 卡片网格: 手机 1 列 / 平板 2 列 / 桌面 3 列 / 宽屏 5 列 ===== */
+		main {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(min(100%, 20.5rem), 1fr));
+			gap: clamp(.75rem, 1.6vw, 1.15rem);
+			align-items: start;
+		}
+		.card {
+			--ac: #fff;
+			--gl: rgba(255, 255, 255, .5);
+			container-type: inline-size;           /* 让按钮字号跟随卡片宽度 */
+			padding: .9rem .9rem .75rem;
+			border: 1px solid var(--line);
+			border-radius: 1.1rem;
+			background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 50%), var(--card);
+			box-shadow: 0 10px 28px -12px var(--gl);   /* 彩色光晕, 不用黑色阴影 */
+			transition: box-shadow .25s, border-color .25s;
+		}
+		.card:nth-child(6n+1) { --ac: #ef3b36; --gl: rgba(239, 59, 54, .55); }
+		.card:nth-child(6n+2) { --ac: #ff8a00; --gl: rgba(255, 138, 0, .55); }
+		.card:nth-child(6n+3) { --ac: #e6b800; --gl: rgba(230, 184, 0, .6); }
+		.card:nth-child(6n+4) { --ac: #2fa84f; --gl: rgba(47, 168, 79, .55); }
+		.card:nth-child(6n+5) { --ac: #1e88e5; --gl: rgba(30, 136, 229, .55); }
+		.card:nth-child(6n+6) { --ac: #8e44ff; --gl: rgba(142, 68, 255, .55); }
+		.card h2 { display: flex; align-items: baseline; gap: .5rem; margin: 0 .15rem .75rem; font-size: 1.2rem; font-weight: 800; letter-spacing: .02em; }
+		.card h2::before { content: ""; align-self: center; width: .3rem; height: 1.1rem; border-radius: 3px; background: var(--ac); }
+		.card h2 span { font-size: .82rem; font-weight: 600; color: var(--ink-soft); }
+		.card ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; padding: .1rem 0 .25rem; }
+
+		/* 链接按钮: 悬停放大 + 彩色光晕 */
+		.card li a {
+			position: relative;
+			display: block;
+			height: 2.75rem;                       /* 触控目标 >= 44px */
+			line-height: calc(2.75rem - 2px);
+			padding: 0 .15rem;
+			text-align: center;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			border: 1px solid rgba(255, 255, 255, .75);
+			border-radius: .7rem;
+			background: var(--chip);
+			font-size: clamp(.78rem, 4.5cqw, 1rem);
+			font-weight: 600;
+			white-space: nowrap;
+			transition: transform .2s cubic-bezier(.3, 1.7, .5, 1), background .15s, box-shadow .2s;
+		}
+		.card li a:focus-visible, .card li a:active {
+			transform: scale(1.14);
+			background: rgba(255, 255, 255, .95);
+			outline: 0;
+		}
+		.card li a:active { transform: scale(1.04); }
+
+		/* 彩虹眩光: 做在外层 li 上 (按钮自身 overflow:hidden 会把外圈光裁掉)
+		   ::before = 柔和的彩虹光晕, ::after = 细彩虹描边; 悬停时旋转流动 */
+		@property --a { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+		@keyframes orbit { to { --a: 360deg; } }
+		.card li { position: relative; isolation: isolate; }
+		.card li::before, .card li::after {
+			content: "";
+			position: absolute;
+			inset: -2px;
+			z-index: -1;
+			border-radius: .85rem;
+			background: conic-gradient(from var(--a), #ff3b30, #ff9500, #ffd60a, #34c759, #00d4ff, #5e5ce6, #d946ef, #ff3b30);
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity .25s, transform .25s cubic-bezier(.3, 1.7, .5, 1);
+		}
+		.card li::before { inset: -5px; border-radius: 1.1rem; filter: blur(11px); }
+		.card li:focus-within::before, .card li:active::before { opacity: .95; transform: scale(1.14); animation: orbit 2.4s linear infinite; }
+		.card li:focus-within::after, .card li:active::after { opacity: 1; transform: scale(1.14); animation: orbit 2.4s linear infinite; }
+		.card:focus-within { position: relative; z-index: 3; }   /* 光晕不被相邻卡片盖住 */
+		@media (hover: hover) {
+			.card:hover { position: relative; z-index: 3; border-color: #fff; box-shadow: 0 0 0 1px var(--ac), 0 12px 34px -8px var(--gl); }
+			.card li:hover::before { opacity: .95; transform: scale(1.14); animation: orbit 2.4s linear infinite; }
+			.card li:hover::after { opacity: 1; transform: scale(1.14); animation: orbit 2.4s linear infinite; }
+			.card li a:hover { transform: scale(1.14); background: rgba(255, 255, 255, .95); }
+		}
+		@media (prefers-reduced-motion: reduce) { .card li::before, .card li::after { animation: none !important; } }
+
+		/* ===== 其他 ===== */
+		.note {
+			display: none;
+			width: fit-content;
+			max-width: 100%;
+			margin: 2.25rem auto;
+			padding: .6rem 1.25rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			background: rgba(255, 255, 255, .5);
+			font-weight: 600;
+			text-align: center;
+		}
+		footer {
+			width: fit-content;
+			max-width: 100%;
+			margin: 2.25rem auto 0;
+			padding: .6rem 1.4rem;
+			border: 1px solid var(--line);
+			border-radius: 1rem;
+			background: rgba(255, 255, 255, .4);
+			text-align: center;
+			font-size: .82rem;
+			font-weight: 500;
+			line-height: 1.9;
+		}
+		footer a:hover { text-decoration: underline; }
+
+		/* ===== 自适应断点 ===== */
+		@media (min-width: 1840px) { .wrap { max-width: 114rem; } }   /* 5 列, 3 行 */
+		@media (min-width: 1920px) { html { font-size: 17px; } :root { --k: 1.0625; } }
+		@media (min-width: 2560px) { html { font-size: 20px; } :root { --k: 1.25; } }
+		@media (min-width: 3200px) { html { font-size: 24px; } :root { --k: 1.5; } }
+		@media (min-width: 3840px) { html { font-size: 28px; } :root { --k: 1.75; } }
+		@media (max-width: 480px) {
+			.search { padding: 0 .65rem; gap: .5rem; }
+			.card ul { gap: .45rem; }
+		}
+		@media (max-width: 340px) { .card { padding: .75rem .65rem .6rem; } .card h2 { font-size: 1.1rem; } }
+		@media (max-height: 520px) and (orientation: landscape) {   /* 横屏手机: 压缩顶部 */
+			:root { --k: .7; }
+			header { margin-bottom: 1rem; }
+			.wrap { padding-top: .75rem; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			* { transition: none !important; }
+			html { scroll-behavior: auto; }
+		}
+		@media print { body::before, .cube-scene, .search { display: none; } .card { background: none; box-shadow: none; break-inside: avoid; } }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<header>
+			<div class="cube-scene" id="logo" role="button" tabindex="0" aria-label="ME2 魔方，点击还原"><div class="cube" id="cube"></div></div>
+			<label class="search" id="s">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+				<span class="auto" id="auto" data-v="输入文字筛选站点，回车用 Startpage 搜索"><input id="q" type="text" placeholder="输入文字筛选站点，回车用 Startpage 搜索" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="输入文字筛选站点，回车用 Startpage 搜索"></span>
+			</label>
+		</header>
+
+		<!--
+			编辑说明:
+			  · 新增链接: 在对应 <ul> 里复制一行 <li><a href="网址">名称</a></li>
+			  · 新增分组: 复制一整个 <section class="card"> ... </section>
+		-->
+		<main>
+			<!-- 生活 · 购物 -->
+			<section class="card">
+				<h2><b>生活</b><span>购物</span></h2>
+				<ul>
+					<li><a href="https://www.taobao.com">淘宝</a></li>
+					<li><a href="https://2.taobao.com">闲鱼</a></li>
+					<li><a href="https://www.jd.com">京东</a></li>
+					<li><a href="https://amap.com">地图</a></li>
+					<li><a href="https://drive.google.com">谷歌云盘</a></li>
+					<li><a href="https://mail.google.com">Gmail</a></li>
+					<li><a href="https://tw.shop.battle.net/zh-tw">Blizzard</a></li>
+					<li><a href="https://store.steampowered.com/search/?filter=globaltopsellers&amp;os=win">Steam</a></li>
+					<li><a href="https://account.proton.me/login">Proton</a></li>
+				</ul>
+			</section>
+
+			<!-- 常用 · 社区 -->
+			<section class="card">
+				<h2><b>常用</b><span>社区</span></h2>
+				<ul>
+					<li><a href="https://hostloc.com/archiver/">HOSTLOC</a></li>
+					<li><a href="https://weibo.com/at/weibo">微博</a></li>
+					<li><a href="https://forum.gamer.com.tw/B.php?bsn=60030">巴哈姆特</a></li>
+					<li><a href="https://www.nodeseek.com">NodeSeek</a></li>
+					<li><a href="https://lowendtalk.com">LET</a></li>
+					<li><a href="https://lowendspirit.com">LES</a></li>
+					<li><a href="https://www.reddit.com/?feed=home&amp;feedViewType=compactView">Reddit</a></li>
+					<li><a href="https://www.right.com.cn/forum/archiver/">恩山</a></li>
+					<li><a href="https://www.webhostingtalk.com">WHT</a></li>
+				</ul>
+			</section>
+
+			<!-- 影音 · 娱乐 -->
+			<section class="card">
+				<h2><b>影音</b><span>娱乐</span></h2>
+				<ul>
+					<li><a href="https://www.youtube.com/feed/subscriptions">YouTube</a></li>
+					<li><a href="https://music.youtube.com/library">YT Music</a></li>
+					<li><a href="https://music.apple.com">Apple Music</a></li>
+					<li><a href="http://steam.li">离线下载</a></li>
+					<li><a href="https://box.ogc.cc">Seedbox</a></li>
+					<li><a href="https://mastodon.social/explore">Mastodon</a></li>
+					<li><a href="https://www.twitch.tv/directory?sort=VIEWER_COUNT">Twitch</a></li>
+					<li><a href="https://discord.com/app">Discord</a></li>
+					<li><a href="https://imginn.com/owlcityofficial/">Instagram</a></li>
+				</ul>
+			</section>
+
+			<!-- PC · 必备 -->
+			<section class="card">
+				<h2><b>PC</b><span>必备</span></h2>
+				<ul>
+					<li><a href="https://ungoogled-software.github.io/ungoogled-chromium-binaries">Chromium</a></li>
+					<li><a href="https://helium.computer/download">Helium</a></li>
+					<li><a href="https://www.torproject.org/download/">Tor Browser</a></li>
+					<li><a href="https://www.freedownloadmanager.org/download.htm">FDM</a></li>
+					<li><a href="https://potplayer.tv/?lang=zh_CN">PotPlayer</a></li>
+					<li><a href="https://www.bandisoft.com/honeyview/">Honeyview</a></li>
+					<li><a href="https://otp.landian.vip/zh-cn/download.html">OfficeTool</a></li>
+					<li><a href="https://chat.conversejs.org">XMPP Chat</a></li>
+					<li><a href="https://delta.chat/download">Delta Chat</a></li>
+				</ul>
+			</section>
+
+			<!-- PC · 必备 -->
+			<section class="card">
+				<h2><b>PC</b><span>必备</span></h2>
+				<ul>
+					<li><a href="https://www.blizzard.com/zh-tw/download">Battle.net</a></li>
+					<li><a href="https://store.steampowered.com/about">Steam</a></li>
+					<li><a href="https://rime.im/download/">Rime</a></li>
+					<li><a href="https://github.com/rustdesk/rustdesk/releases">RustDesk</a></li>
+					<li><a href="https://localsend.org/download">LocalSend</a></li>
+					<li><a href="https://logitech.zendesk.com/hc/articles/360025298133">G HUB</a></li>
+					<li><a href="https://www.xshell.com/free-for-home-school">Xshell</a></li>
+					<li><a href="https://notepad-plus-plus.org/downloads">Notepad++</a></li>
+					<li><a href="https://massgrave.dev/windows_ltsc_links">Windows</a></li>
+				</ul>
+			</section>
+
+			<!-- 搜索 · 资源 -->
+			<section class="card">
+				<h2><b>搜索</b><span>资源</span></h2>
+				<ul>
+					<li><a href="https://www.google.com/ncr">Google</a></li>
+					<li><a href="https://www.startpage.com/do/mypage.pl?prfe=48a57de20bb43f3bcfa7f527c626823c6792470570abe24bd6bdbddff780de158ef4e0f6b5b9138a1cc0ea6ffe7d6f63a6b46b71887e5f689839bb02c31d311f129497248cbaf039a9397313c1e5f191cf">Startpage</a></li>
+					<li><a href="https://duckduckgo.com/?kae=d&amp;kp=-2&amp;kao=-1&amp;kau=-1&amp;kap=-1&amp;kaq=-1&amp;kax=-1&amp;kak=-1&amp;k1=-1&amp;kz=-1&amp;kac=-1&amp;kk=-1&amp;kn=1&amp;kbg=-1&amp;kbe=0">DuckDuckGo</a></li>
+					<li><a href="https://bing.com">Bing</a></li>
+					<li><a href="https://www.perplexity.ai">Perplexity</a></li>
+					<li><a href="https://btdig.com">BTDigg</a></li>
+					<li><a href="https://bt4g.com">BT4G</a></li>
+					<li><a href="https://1337x.to/home/">1337X</a></li>
+					<li><a href="https://bitsearch.to">Bitsearch</a></li>
+				</ul>
+			</section>
+
+			<!-- 在线 · 工具 -->
+			<section class="card">
+				<h2><b>在线</b><span>工具</span></h2>
+				<ul>
+					<li><a href="https://zh-hans.tld-list.com">域名比价</a></li>
+					<li><a href="https://sms-activate.org/cn">在线接码</a></li>
+					<li><a href="https://9xbuddy.com/zh">视频抓取</a></li>
+					<li><a href="https://fastdl.app/zh">INS抓取</a></li>
+					<li><a href="https://app.ytdown.to">YT抓取</a></li>
+					<li><a href="https://snapsave.app">FB抓取</a></li>
+					<li><a href="https://www.strerr.com">YT封面抓取</a></li>
+					<li><a href="https://downsub.com">YT字幕抓取</a></li>
+					<li><a href="https://www.360converter.com">语音转文字</a></li>
+				</ul>
+			</section>
+
+			<!-- 在线 · 工具 -->
+			<section class="card">
+				<h2><b>在线</b><span>工具</span></h2>
+				<ul>
+					<li><a href="https://www.speedtest.net">网络测速</a></li>
+					<li><a href="https://web.baimiaoapp.com">白描OCR</a></li>
+					<li><a href="https://cli.im">二维码</a></li>
+					<li><a href="https://www.canva.cn">在线设计</a></li>
+					<li><a href="https://bj.96weixin.com">96排版</a></li>
+					<li><a href="http://waifu2x.udp.jp/index.zh-CN.html">图片放大</a></li>
+					<li><a href="https://yandex.com/images">搜图</a></li>
+					<li><a href="https://stats.uptimerobot.com/x53EzsLDMB">VPS监控</a></li>
+					<li><a href="https://stats.uptimerobot.com/jPyQQcY8nq">DNS监控</a></li>
+				</ul>
+			</section>
+
+			<!-- 在线 · 实用 -->
+			<section class="card">
+				<h2><b>在线</b><span>实用</span></h2>
+				<ul>
+					<li><a href="https://cookie.work">Base64</a></li>
+					<li><a href="https://www.whois.com/whois">Whois</a></li>
+					<li><a href="https://ping.pe">Ping</a></li>
+					<li><a href="https://gemini.google.com/app">Gemini</a></li>
+					<li><a href="https://chatgpt.com/?temporary-chat=true">ChatGPT</a></li>
+					<li><a href="https://grok.com">Grok</a></li>
+					<li><a href="https://f-droid.org/zh_Hans/">F-Droid</a></li>
+					<li><a href="https://savesubs.com/zh">字幕转换</a></li>
+					<li><a href="https://ipleak.net">IP Leak</a></li>
+				</ul>
+			</section>
+
+			<!-- GitHub · 热门 -->
+			<section class="card">
+				<h2><b>GitHub</b><span>热门</span></h2>
+				<ul>
+					<li><a href="https://github.com/XTLS/Xray-core/releases">Xray</a></li>
+					<li><a href="https://github.com/2dust/v2rayN/releases">v2rayN</a></li>
+					<li><a href="https://github.com/2dust/v2rayNG/releases">v2rayNG</a></li>
+					<li><a href="https://github.com/gorhill/uBlock">uBO</a></li>
+					<li><a href="https://github.com/Genymobile/scrcpy/releases">scrcpy</a></li>
+					<li><a href="https://massgrave.dev">MAS</a></li>
+					<li><a href="https://github.com/P3TERX/aria2.sh">Aria2</a></li>
+					<li><a href="https://github.com/mayswind/AriaNg/releases">AriaNg</a></li>
+					<li><a href="https://github.com/hiroi-sora/Umi-OCR/releases">Umi-OCR</a></li>
+				</ul>
+			</section>
+
+			<!-- GitHub · 热门 -->
+			<section class="card">
+				<h2><b>GitHub</b><span>热门</span></h2>
+				<ul>
+					<li><a href="https://github.com/TeamNewPipe/NewPipe/releases">NewPipe</a></li>
+					<li><a href="https://revanced.app/download">ReVanced</a></li>
+					<li><a href="https://github.com/gibbed/SteamAchievementManager/releases">SAM</a></li>
+					<li><a href="https://github.com/assimon/dujiaoka/releases">独角数卡</a></li>
+					<li><a href="https://rufus.ie/zh/#download">Rufus</a></li>
+					<li><a href="https://github.com/kalcaddle/KodExplorer/releases">KodExplorer</a></li>
+					<li><a href="https://github.com/sandboxie-plus/Sandboxie/releases">Sandboxie</a></li>
+					<li><a href="https://github.com/sethcottle/littlelink">LittleLink</a></li>
+					<li><a href="https://github.com/antiwar3/py">Pysafe</a></li>
+				</ul>
+			</section>
+
+			<!-- 数据 · 全球 -->
+			<section class="card">
+				<h2><b>数据</b><span>全球</span></h2>
+				<ul>
+					<li><a href="https://steamdb.info">SteamDB</a></li>
+					<li><a href="https://twitchtracker.com/games">直播热度</a></li>
+					<li><a href="https://store.steampowered.com/charts">游戏热度</a></li>
+					<li><a href="https://store.steampowered.com/stats/content">下载统计</a></li>
+					<li><a href="https://store.steampowered.com/hwsurvey">主流配置</a></li>
+					<li><a href="https://help.steampowered.com/zh-cn/accountdata/AccountSpend">账户数据</a></li>
+					<li><a href="https://www.passportindex.org/cn/byRank.php">护照排名</a></li>
+					<li><a href="https://rsf.org/en/index">新闻自由</a></li>
+					<li><a href="https://www.marinetraffic.com/zh">船只追踪</a></li>
+				</ul>
+			</section>
+
+			<!-- Chrome · 扩展 -->
+			<section class="card">
+				<h2><b>Chrome</b><span>扩展</span></h2>
+				<ul>
+					<li><a href="https://chrome.google.com/webstore/detail/ddkjiahejlhfcafbddmgiahcphecmpfh">uBOL</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/mihcahmgecmbnbcchbopgniflfhgnkff">Gmail提醒</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/nngceckbapebfimnlniiiahkandclblb">Bitwarden</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/mciiogijehkdemklbdcbfkefimifhecn">下载利器</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/eimadpbcbfnmbkopoojfekhnkhdbieeh">夜间模式</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/ponfpcnoihfmfllpaingbgckeeldkhle">油管助手</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/gkkkcomfmldkigajkmljnbpiajbpbgdg">页面翻译</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/mcbpblocgmgfnpjjppndjkmgjaogfceg">网页截图</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/gcalenpjmijncebpfijmoaglllgpjagf">篡改猴</a></li>
+				</ul>
+			</section>
+
+			<!-- Chrome · 扩展 -->
+			<section class="card">
+				<h2><b>Chrome</b><span>扩展</span></h2>
+				<ul>
+					<li><a href="https://chrome.google.com/webstore/detail/kdbmhfkmnlmbkgbabkdealhhbfhlmmon">SteamDB</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/cmeakgjggjdlcpncigglobpjbkabhmjl">Steam助手</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/cfohepagpmnodfdmjliccbbigdkfcgia">虚拟定位</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/inlikjemeeknofckkjolnjbpehgadgge">网页监控</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/fjkmabmdepjfammlpliljpnbhleegehm">WebRTC</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/oomoeacogjkolheacgdkkkhbjipaomkn">自动刷新</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/abbpaepbpakcpipajigmlpnhlnbennna">音乐模式</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/mmioliijnhnoblpgimnlajmefafdfilb">听歌识曲</a></li>
+					<li><a href="https://chrome.google.com/webstore/detail/bdokeillmfmaogjpficejjcjekcflkdh">家宽代理</a></li>
+				</ul>
+			</section>
+
+			<!-- 建站 · 系统 -->
+			<section class="card">
+				<h2><b>建站</b><span>系统</span></h2>
+				<ul>
+					<li><a href="https://1panel.pro">1Panel</a></li>
+					<li><a href="https://www.cloudpanel.io">CloudPanel</a></li>
+					<li><a href="https://tw.wordpress.org/download/">WordPress</a></li>
+					<li><a href="https://www.whmcs.com">WHMCS</a></li>
+					<li><a href="https://www.virtualizor.com">Virtualizor</a></li>
+					<li><a href="https://stripe.com/zh-cn-us">Stripe</a></li>
+					<li><a href="https://www.idcsmart.com">智减魔方</a></li>
+					<li><a href="https://porkbun.com/account/domainsSpeedy">Porkbun</a></li>
+					<li><a href="https://dash.cloudflare.com">Cloudflare</a></li>
+				</ul>
+			</section>
+		</main>
+
+		<p class="note" id="empty">没有匹配的站点，回车用 Startpage 搜索</p>
+
+		<footer>
+			<p>&copy; 2026 Midas. All rights reserved.</p>
+			<p>法务支持：<a href="mailto:comments@whitehouse.gov" target="_self">comments@whitehouse.gov</a></p>
+		</footer>
+	</div>
+
+	<script>
+		/* ========== 搜索 / 筛选 (索引在第一次输入时才建立) ========== */
+		(function () {
+			var q = document.getElementById('q');
+			var box = document.getElementById('s');
+			var auto = document.getElementById('auto');
+			var empty = document.getElementById('empty');
+			var cards, index, timer;
+
+			function build() {
+				cards = [].slice.call(document.querySelectorAll('.card'));
+				index = cards.map(function (card) {
+					return [].slice.call(card.querySelectorAll('li')).map(function (li) {
+						var a = li.firstChild;
+						return [li, (a.textContent + ' ' + a.href).toLowerCase()];
+					});
+				});
+			}
+
+			// 提示文字: 优先完整版; 窄屏放不下时依次换更短的 (字号不能小于 16px, 否则 iOS 聚焦会放大页面)
+			var HINTS = [q.placeholder, '输入筛选站点，回车 Startpage 搜索', '筛选站点，回车 Startpage 搜索', '筛选，回车 Startpage 搜索'];
+			var ctx = document.createElement('canvas').getContext('2d');
+			function pickHint() {
+				var cs = getComputedStyle(box), fs = getComputedStyle(auto);
+				var room = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - box.firstElementChild.getBoundingClientRect().width - parseFloat(cs.columnGap);
+				ctx.font = '600 ' + fs.fontSize + ' ' + getComputedStyle(q).fontFamily;
+				var i = 0;
+				while (i < HINTS.length - 1 && ctx.measureText(HINTS[i]).width + 4 > room) i++;
+				q.placeholder = HINTS[i];
+				fit();
+			}
+
+			function fit() {                       // 输入框宽度跟随文字, 让 放大镜+文字 始终居中
+				auto.dataset.v = q.value || q.placeholder;
+			}
+
+			function run() {
+				if (!cards) build();
+				var v = q.value.trim().toLowerCase();
+				var any = false;
+				cards.forEach(function (card, i) {
+					var n = 0;
+					index[i].forEach(function (p) {
+						var ok = !v || p[1].indexOf(v) > -1;
+						p[0].hidden = !ok;
+						if (ok) n++;
+					});
+					card.hidden = !n;
+					if (n) any = true;
+				});
+				empty.style.display = any ? 'none' : 'block';
+			}
+
+			q.addEventListener('input', function () {
+				fit();
+				clearTimeout(timer);
+				timer = setTimeout(run, 60);
+			});
+
+			q.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') {
+					var v = q.value.trim();
+					if (v && !e.isComposing) window.open('https://www.startpage.com/search?q=' + encodeURIComponent(v), '_blank', 'noopener,noreferrer');
+				} else if (e.key === 'Escape') {
+					q.value = '';
+					fit();
+					run();
+					q.blur();
+				}
+			});
+
+			var rz;
+			addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(pickHint, 120); });
+			pickHint();
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === '/' && document.activeElement !== q && !e.ctrlKey && !e.metaKey && !e.altKey) {
+					e.preventDefault();
+					q.focus();
+				}
+			});
+		})();
+
+		/* ========== 魔方 ==========
+		   27 个小方块, 每块一个 3x3 旋转矩阵; 横切/竖切 = 对同一层的方块整体转 90°。
+		   自动循环: 随机打乱 → 到达步数后自动还原 → 停顿 → 再次打乱。点击魔方立即还原。
+		   首屏内容绘制完成后才生成, 不占用启动时间。 */
+		function initCube() {
+			var S = 17, Q = Math.PI / 2;
+			var scene = document.getElementById('logo');
+			var root = document.getElementById('cube');
+
+			// [轴(0=x 1=y 2=z), 方向]  顺序对应 CSS 里的 .p0-.p5 / .k0-.k5
+			var FACES = [[2, 1], [2, -1], [0, 1], [0, -1], [1, -1], [1, 1]];
+			var I = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+			var cubies = [];
+
+			function mul(A, B) {
+				var C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], i, j, k;
+				for (i = 0; i < 3; i++) for (j = 0; j < 3; j++) for (k = 0; k < 3; k++) C[i][j] += A[i][k] * B[k][j];
+				return C;
+			}
+			function rot(a, t) {
+				var c = Math.cos(t), s = Math.sin(t);
+				return a === 0 ? [[1, 0, 0], [0, c, -s], [0, s, c]]
+					: a === 1 ? [[c, 0, s], [0, 1, 0], [-s, 0, c]]
+					: [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+			}
+			function apply(R, p) {
+				return [0, 1, 2].map(function (i) { return R[i][0] * p[0] + R[i][1] * p[1] + R[i][2] * p[2]; });
+			}
+			function pos(cb) { return apply(cb.R, cb.p).map(Math.round); }
+			function place(cb, R) {
+				var t = apply(R, cb.p).map(function (n) { return n * S; });
+				cb.el.style.transform = 'matrix3d(' + [
+					R[0][0], R[1][0], R[2][0], 0,
+					R[0][1], R[1][1], R[2][1], 0,
+					R[0][2], R[1][2], R[2][2], 0,
+					t[0], t[1], t[2], 1
+				].map(function (n) { return +n.toFixed(4); }).join(',') + ')';
+			}
+
+			// 搭建魔方: 一次 innerHTML 生成全部 27 块
+			var html = '', coords = [];
+			for (var x = -1; x <= 1; x++) for (var y = -1; y <= 1; y++) for (var z = -1; z <= 1; z++) {
+				var p = [x, y, z];
+				coords.push(p);
+				html += '<div class="cb">' + FACES.map(function (f, i) {
+					return '<i class="f p' + i + (p[f[0]] === f[1] ? ' k' + i : '') + '"></i>';
+				}).join('') + '</div>';
+			}
+			root.innerHTML = html;
+			[].forEach.call(root.children, function (el, i) {
+				var cb = { el: el, p: coords[i], R: I };
+				place(cb, I);
+				cubies.push(cb);
+			});
+			root.className += ' ready';
+
+			// 转动一层: m = {a: 轴, l: 层(-1/0/1), d: 方向(±1)}
+			function turn(m, ms, done) {
+				var set = cubies.filter(function (cb) { return pos(cb)[m.a] === m.l; });
+				var t0 = 0;
+				function frame(now) {
+					if (!t0) t0 = now;
+					var k = Math.min(1, (now - t0) / ms);
+					var e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+					var r = rot(m.a, m.d * Q * e);
+					set.forEach(function (cb) { place(cb, mul(r, cb.R)); });
+					if (k < 1) return requestAnimationFrame(frame);
+					var end = rot(m.a, m.d * Q);
+					set.forEach(function (cb) {
+						cb.R = mul(end, cb.R).map(function (row) { return row.map(Math.round); });
+						place(cb, cb.R);
+					});
+					done();
+				}
+				requestAnimationFrame(frame);
+			}
+
+			// 自动循环
+			var hist = [], last = null, mode = 'scramble', busy = false, timer = 0, cap = 0, seen = true;
+			function rnd(n) { return Math.floor(Math.random() * n); }
+			function newCap() { cap = 16 + rnd(7); }
+			function later(fn, ms) { clearTimeout(timer); timer = setTimeout(fn, ms); }
+			function randMove() {
+				var m;
+				do { m = { a: rnd(3), l: rnd(3) - 1, d: rnd(2) ? 1 : -1 }; }
+				while (last && last.a === m.a && last.l === m.l);
+				last = m;
+				return m;
+			}
+			function step() {
+				if (busy) return;
+				if (!seen) return later(step, 400);       // 魔方滚出视野: 暂停, 省电
+				var m;
+				if (mode === 'solve') {
+					if (!hist.length) { mode = 'scramble'; last = null; newCap(); return later(step, 1300); }
+					m = hist.pop();
+					busy = true;
+					turn({ a: m.a, l: m.l, d: -m.d }, 210, function () { busy = false; step(); });
+				} else {
+					if (hist.length >= cap) { mode = 'solve'; return later(step, 1800); }
+					m = randMove();
+					hist.push(m);
+					busy = true;
+					turn(m, 440, function () { busy = false; later(step, 70); });
+				}
+			}
+			function solveNow() {
+				if (mode === 'solve') return;
+				mode = 'solve';
+				clearTimeout(timer);
+				step();
+			}
+
+			scene.addEventListener('click', solveNow);
+			scene.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); solveNow(); }
+			});
+			if ('IntersectionObserver' in window) {
+				new IntersectionObserver(function (es) {
+					seen = es[0].isIntersecting;
+					scene.classList.toggle('off', !seen);
+				}).observe(scene);
+			}
+			newCap();
+			later(step, 700);
+		}
+		// 先让页面内容绘制出来, 再在空闲时生成魔方
+		requestAnimationFrame(function () { setTimeout(initCube, 0); });
+	</script>
+</body>
+</html>
